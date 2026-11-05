@@ -62,7 +62,6 @@ namespace RemoteClient
                 }
             };
 
-            // Switch gọn gàng với icon hoa đào
             pnlSwitch.Paint += (s, e) =>
             {
                 e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
@@ -106,7 +105,7 @@ namespace RemoteClient
                 Color.FromArgb(255, 215, 0)
             };
 
-            for (int i = 0; i < 28; i++)
+            for (int i = 0; i < 26; i++)
             {
                 petals.Add(new BlossomPetal
                 {
@@ -167,7 +166,7 @@ namespace RemoteClient
             }
             else
             {
-                lblCountdown.Text = "Tết Đinh Mùi 2027 đã đến!\nChúc bạn và gia đình vạn sự như ý ╰(*°▽°*)╯";
+                lblCountdown.Text = "Tết Đinh Mùi 2027 đã đến!\nChúc bạn vạn sự như ý ╰(*°▽°*)╯";
             }
         }
 
@@ -239,7 +238,6 @@ namespace RemoteClient
         {
             if (isTetTheme)
             {
-                lblSwitchText.Text = "🌸";
                 lblSwitchText.ForeColor = Color.FromArgb(220, 50, 60);
 
                 panelHeader.BackColor = Color.FromArgb(254, 244, 245);
@@ -250,20 +248,15 @@ namespace RemoteClient
 
                 btnConnect.BackColor = Color.FromArgb(220, 50, 60);
 
-                // Bỏ dòng chữ thừa phía trên để nhường trọn khung cho Countdown
-                lblStatus.Text = "";
+                // Ẩn dòng status thông thường để nhường trọn khung cho Countdown
                 lblStatus.Visible = false;
+                lblStatus.Text = "";
 
                 lblCountdown.Visible = true;
-                lblCountdown.Location = new Point(10, 225);
-                lblCountdown.Size = new Size(360, 60);
-                lblCountdown.TextAlign = ContentAlignment.MiddleCenter;
-                lblCountdown.Font = new Font("Segoe UI", 8.5F, FontStyle.Italic);
                 UpdateCountdownDisplay();
             }
             else
             {
-                lblSwitchText.Text = "🌸";
                 lblSwitchText.ForeColor = Color.FromArgb(140, 145, 155);
 
                 panelHeader.BackColor = Color.FromArgb(248, 249, 251);
@@ -277,7 +270,6 @@ namespace RemoteClient
                 lblStatus.Visible = true;
                 lblStatus.Text = "SẴN SÀNG KẾT NỐI";
                 lblStatus.ForeColor = Color.FromArgb(150, 155, 165);
-                lblStatus.Location = new Point(25, 230);
 
                 lblCountdown.Visible = false;
             }
@@ -298,8 +290,11 @@ namespace RemoteClient
                 return;
             }
 
-            lblStatus.Text = "ĐANG KẾT NỐI...";
-            lblStatus.ForeColor = Color.FromArgb(230, 130, 0);
+            if (!isTetTheme)
+            {
+                lblStatus.Text = "ĐANG KẾT NỐI...";
+                lblStatus.ForeColor = Color.FromArgb(230, 130, 0);
+            }
 
             try
             {
@@ -315,27 +310,39 @@ namespace RemoteClient
                 if (!isAuthenticated)
                 {
                     MessageBox.Show("Mã PIN không đúng! Kết nối bị từ chối.", "Lỗi PIN", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    lblStatus.Text = "SAI MÃ PIN";
-                    lblStatus.ForeColor = Color.FromArgb(220, 53, 69);
+                    if (!isTetTheme)
+                    {
+                        lblStatus.Text = "SAI MÃ PIN";
+                        lblStatus.ForeColor = Color.FromArgb(220, 53, 69);
+                    }
                     client.Close();
                     return;
                 }
 
-                lblStatus.Text = "KẾT NỐI THÀNH CÔNG";
-                lblStatus.ForeColor = Color.FromArgb(40, 167, 69);
+                if (!isTetTheme)
+                {
+                    lblStatus.Text = "KẾT NỐI THÀNH CÔNG";
+                    lblStatus.ForeColor = Color.FromArgb(40, 167, 69);
+                }
 
                 this.Hide();
                 RemoteViewer viewer = new RemoteViewer(client, stream, writer, reader);
                 viewer.ShowDialog();
 
-                lblStatus.Text = isTetTheme ? "CHÚC MỪNG NĂM MỚI 2027" : "SẴN SÀNG KẾT NỐI";
-                lblStatus.ForeColor = isTetTheme ? Color.FromArgb(195, 35, 45) : Color.FromArgb(150, 155, 165);
+                if (!isTetTheme)
+                {
+                    lblStatus.Text = "SẴN SÀNG KẾT NỐI";
+                    lblStatus.ForeColor = Color.FromArgb(150, 155, 165);
+                }
                 this.Show();
             }
             catch (Exception ex)
             {
-                lblStatus.Text = "KẾT NỐI THẤT BẠI";
-                lblStatus.ForeColor = Color.FromArgb(220, 53, 69);
+                if (!isTetTheme)
+                {
+                    lblStatus.Text = "KẾT NỐI THẤT BẠI";
+                    lblStatus.ForeColor = Color.FromArgb(220, 53, 69);
+                }
                 MessageBox.Show("Không thể kết nối đến máy chủ: " + ex.Message, "Lỗi kết nối", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }

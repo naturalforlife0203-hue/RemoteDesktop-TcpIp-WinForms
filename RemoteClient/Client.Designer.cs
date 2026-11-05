@@ -22,6 +22,7 @@
             this.lblSub = new System.Windows.Forms.Label();
             this.lblTitle = new System.Windows.Forms.Label();
             this.panelCard = new System.Windows.Forms.Panel();
+            this.lblCountdown = new System.Windows.Forms.Label();
             this.lblIP = new System.Windows.Forms.Label();
             this.txtIP = new System.Windows.Forms.TextBox();
             this.lblPort = new System.Windows.Forms.Label();
@@ -30,7 +31,6 @@
             this.txtPin = new System.Windows.Forms.TextBox();
             this.btnConnect = new System.Windows.Forms.Button();
             this.lblStatus = new System.Windows.Forms.Label();
-            this.lblCountdown = new System.Windows.Forms.Label();
             this.panelHeader.SuspendLayout();
             this.panelCard.SuspendLayout();
             this.SuspendLayout();
@@ -50,21 +50,20 @@
             // 
             // lblSwitchText
             // 
-            this.lblSwitchText.AutoSize = true;
-            this.lblSwitchText.Font = new System.Drawing.Font("Segoe UI Semibold", 8F, System.Drawing.FontStyle.Bold);
-            this.lblSwitchText.ForeColor = System.Drawing.Color.FromArgb(120, 125, 135);
-            this.lblSwitchText.Location = new System.Drawing.Point(348, 16);
+            this.lblSwitchText.Font = new System.Drawing.Font("Segoe UI", 9.5F);
+            this.lblSwitchText.ForeColor = System.Drawing.Color.FromArgb(140, 145, 155);
+            this.lblSwitchText.Location = new System.Drawing.Point(340, 12);
             this.lblSwitchText.Name = "lblSwitchText";
-            this.lblSwitchText.Size = new System.Drawing.Size(43, 19);
+            this.lblSwitchText.Size = new System.Drawing.Size(56, 22);
             this.lblSwitchText.TabIndex = 3;
-            this.lblSwitchText.Text = "TẾT";
+            this.lblSwitchText.Text = "🌸";
             this.lblSwitchText.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // pnlSwitch
             // 
             this.pnlSwitch.BackColor = System.Drawing.Color.Transparent;
             this.pnlSwitch.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.pnlSwitch.Location = new System.Drawing.Point(344, 38);
+            this.pnlSwitch.Location = new System.Drawing.Point(340, 38);
             this.pnlSwitch.Name = "pnlSwitch";
             this.pnlSwitch.Size = new System.Drawing.Size(56, 28);
             this.pnlSwitch.TabIndex = 2;
@@ -104,10 +103,22 @@
             this.panelCard.Controls.Add(this.txtPin);
             this.panelCard.Controls.Add(this.btnConnect);
             this.panelCard.Controls.Add(this.lblStatus);
-            this.panelCard.Location = new System.Drawing.Point(25, 105);
+            this.panelCard.Location = new System.Drawing.Point(25, 102);
             this.panelCard.Name = "panelCard";
-            this.panelCard.Size = new System.Drawing.Size(380, 325);
+            this.panelCard.Size = new System.Drawing.Size(380, 310);
             this.panelCard.TabIndex = 1;
+            // 
+            // lblCountdown
+            // 
+            this.lblCountdown.Font = new System.Drawing.Font("Segoe UI", 8.5F, System.Drawing.FontStyle.Italic);
+            this.lblCountdown.ForeColor = System.Drawing.Color.FromArgb(200, 45, 55);
+            this.lblCountdown.Location = new System.Drawing.Point(10, 225);
+            this.lblCountdown.Name = "lblCountdown";
+            this.lblCountdown.Size = new System.Drawing.Size(360, 65);
+            this.lblCountdown.TabIndex = 8;
+            this.lblCountdown.Text = "";
+            this.lblCountdown.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.lblCountdown.Visible = false;
             // 
             // lblIP
             // 
@@ -137,7 +148,7 @@
             this.lblPort.AutoSize = true;
             this.lblPort.Font = new System.Drawing.Font("Segoe UI Semibold", 8.5F, System.Drawing.FontStyle.Bold);
             this.lblPort.ForeColor = System.Drawing.Color.FromArgb(115, 120, 130);
-            this.lblPort.Location = new System.Drawing.Point(25, 80);
+            this.lblPort.Location = new System.Drawing.Point(25, 78);
             this.lblPort.Name = "lblPort";
             this.lblPort.Size = new System.Drawing.Size(46, 20);
             this.lblPort.TabIndex = 2;
@@ -149,7 +160,7 @@
             this.txtPort.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.txtPort.Font = new System.Drawing.Font("Consolas", 10.5F);
             this.txtPort.ForeColor = System.Drawing.Color.FromArgb(40, 45, 55);
-            this.txtPort.Location = new System.Drawing.Point(25, 104);
+            this.txtPort.Location = new System.Drawing.Point(25, 102);
             this.txtPort.Name = "txtPort";
             this.txtPort.Size = new System.Drawing.Size(150, 28);
             this.txtPort.TabIndex = 3;
@@ -160,7 +171,7 @@
             this.lblPin.AutoSize = true;
             this.lblPin.Font = new System.Drawing.Font("Segoe UI Semibold", 8.5F, System.Drawing.FontStyle.Bold);
             this.lblPin.ForeColor = System.Drawing.Color.FromArgb(115, 120, 130);
-            this.lblPin.Location = new System.Drawing.Point(200, 80);
+            this.lblPin.Location = new System.Drawing.Point(200, 78);
             this.lblPin.Name = "lblPin";
             this.lblPin.Size = new System.Drawing.Size(60, 20);
             this.lblPin.TabIndex = 4;
@@ -172,7 +183,7 @@
             this.txtPin.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.txtPin.Font = new System.Drawing.Font("Consolas", 10.5F);
             this.txtPin.ForeColor = System.Drawing.Color.FromArgb(40, 45, 55);
-            this.txtPin.Location = new System.Drawing.Point(205, 104);
+            this.txtPin.Location = new System.Drawing.Point(205, 102);
             this.txtPin.Name = "txtPin";
             this.txtPin.Size = new System.Drawing.Size(150, 28);
             this.txtPin.TabIndex = 5;
@@ -186,7 +197,7 @@
             this.btnConnect.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnConnect.Font = new System.Drawing.Font("Segoe UI", 10.5F, System.Drawing.FontStyle.Bold);
             this.btnConnect.ForeColor = System.Drawing.Color.White;
-            this.btnConnect.Location = new System.Drawing.Point(25, 160);
+            this.btnConnect.Location = new System.Drawing.Point(25, 155);
             this.btnConnect.Name = "btnConnect";
             this.btnConnect.Size = new System.Drawing.Size(330, 46);
             this.btnConnect.TabIndex = 6;
@@ -196,33 +207,21 @@
             // 
             // lblStatus
             // 
-            this.lblStatus.Font = new System.Drawing.Font("Segoe UI Semibold", 8F, System.Drawing.FontStyle.Bold);
+            this.lblStatus.Font = new System.Drawing.Font("Segoe UI Semibold", 8.5F, System.Drawing.FontStyle.Bold);
             this.lblStatus.ForeColor = System.Drawing.Color.FromArgb(150, 155, 165);
-            this.lblStatus.Location = new System.Drawing.Point(25, 230);
+            this.lblStatus.Location = new System.Drawing.Point(25, 235);
             this.lblStatus.Name = "lblStatus";
-            this.lblStatus.Size = new System.Drawing.Size(330, 20);
+            this.lblStatus.Size = new System.Drawing.Size(330, 25);
             this.lblStatus.TabIndex = 7;
             this.lblStatus.Text = "SẴN SÀNG KẾT NỐI";
             this.lblStatus.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // lblCountdown
-            // 
-            this.lblCountdown.Font = new System.Drawing.Font("Segoe UI", 8F, System.Drawing.FontStyle.Italic);
-            this.lblCountdown.ForeColor = System.Drawing.Color.FromArgb(215, 60, 70);
-            this.lblCountdown.Location = new System.Drawing.Point(25, 260);
-            this.lblCountdown.Name = "lblCountdown";
-            this.lblCountdown.Size = new System.Drawing.Size(330, 45);
-            this.lblCountdown.TabIndex = 8;
-            this.lblCountdown.Text = "";
-            this.lblCountdown.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.lblCountdown.Visible = false;
             // 
             // Client
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(244, 245, 248);
-            this.ClientSize = new System.Drawing.Size(430, 460);
+            this.ClientSize = new System.Drawing.Size(430, 440);
             this.Controls.Add(this.panelCard);
             this.Controls.Add(this.panelHeader);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
