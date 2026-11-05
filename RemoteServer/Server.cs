@@ -114,7 +114,6 @@ namespace RemoteServer
             Rectangle bounds = Screen.PrimaryScreen.Bounds;
             ImageCodecInfo jpgEncoder = GetEncoder(ImageFormat.Jpeg);
             EncoderParameters encoderParams = new EncoderParameters(1);
-            // Chất lượng 85 để ảnh nét rõ chữ
             encoderParams.Param[0] = new EncoderParameter(System.Drawing.Imaging.Encoder.Quality, 85L);
 
             while (isRunning && connectedClient != null && connectedClient.Connected)
@@ -142,9 +141,13 @@ namespace RemoteServer
                             }
                         }
                     }
-                    Thread.Sleep(30);
+                    Thread.Sleep(45);
                 }
-                catch { break; }
+                catch
+                {
+                    // Bỏ qua lỗi tạm thời khi chụp màn hình và tiếp tục vòng lặp
+                    Thread.Sleep(50);
+                }
             }
         }
 

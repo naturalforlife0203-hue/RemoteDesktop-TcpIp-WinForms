@@ -312,6 +312,20 @@ namespace RemoteClient
             txtChatLog.AppendText(msg + Environment.NewLine);
         }
 
+        // Hàm hỗ trợ đọc đúng và đủ chính xác số byte từ luồng TCP
+        private byte[] ReadExactBytes(BinaryReader reader, int totalBytes)
+        {
+            byte[] buffer = new byte[totalBytes];
+            int bytesRead = 0;
+            while (bytesRead < totalBytes)
+            {
+                int read = reader.Read(buffer, bytesRead, totalBytes - bytesRead);
+                if (read <= 0) throw new EndOfStreamException("Mất kết nối mạng khi đang nhận ảnh.");
+                bytesRead += read;
+            }
+            return buffer;
+        }
+
         private void ReceiveStreamAndMessages()
         {
             while (isRunning && client != null && client.Connected)
@@ -323,14 +337,21 @@ namespace RemoteClient
                     if (packetType == "SCREEN")
                     {
                         int length = reader.ReadInt32();
-                        byte[] buffer = reader.ReadBytes(length);
+                        // Đọc chính xác toàn bộ mảng byte của khung hình
+                        byte[] buffer = ReadExactBytes(reader, length);
 
                         using (MemoryStream ms = new MemoryStream(buffer))
                         {
-                            Image img = Image.FromStream(ms);
-                            Image old = pictureBoxScreen.Image;
-                            pictureBoxScreen.Image = (Image)img.Clone();
-                            if (old != null) old.Dispose();
+                            Image newImg = Image.FromStream(ms);
+
+                            // Cập nhật giao diện an toàn trên luồng UI
+                            pictureBoxScreen.BeginInvoke((Action)(() =>
+                            {
+                                Image oldImg = pictureBoxScreen.Image;
+                                pictureBoxScreen.Image = (Image)newImg.Clone();
+                                newImg.Dispose();
+                                if (oldImg != null) oldImg.Dispose();
+                            }));
                         }
                     }
                     else if (packetType == "SERVER_CHAT")
@@ -339,7 +360,11 @@ namespace RemoteClient
                         AppendChatLog("[Server]: " + serverMsg);
                     }
                 }
-                catch { break; }
+                catch
+                {
+                    // Nếu mất kết nối hoặc luồng bị ngắt thì thoát vòng lặp an toàn
+                    break;
+                }
             }
         }
 
