@@ -21,6 +21,7 @@ namespace RemoteServer
         private Thread screenThread;
         private Thread commandThread;
         private bool isRunning = false;
+        private readonly object streamLock = new object();
 
         [DllImport("user32.dll")]
         public static extern void mouse_event(int dwFlags, int dx, int dy, int cButtons, int dwExtraInfo);
@@ -28,10 +29,6 @@ namespace RemoteServer
         private const int MOUSEEVENTF_LEFTUP = 0x04;
         private const int MOUSEEVENTF_RIGHTDOWN = 0x08;
         private const int MOUSEEVENTF_RIGHTUP = 0x10;
-
-        [DllImport("user32.dll")]
-        public static extern void keybd_event(byte bVk, byte bScan, uint dwFlags, int dwExtraInfo);
-        private const uint KEYEVENTF_KEYUP = 0x0002;
 
         public Server()
         {
@@ -102,9 +99,23 @@ namespace RemoteServer
             catch { }
         }
 
+        private ImageCodecInfo GetEncoder(ImageFormat format)
+        {
+            ImageCodecInfo[] codecs = ImageCodecInfo.GetImageDecoders();
+            foreach (ImageCodecInfo codec in codecs)
+            {
+                if (codec.FormatID == format.Guid) return codec;
+            }
+            return null;
+        }
+
         private void SendScreenStream()
         {
             Rectangle bounds = Screen.PrimaryScreen.Bounds;
+            ImageCodecInfo jpgEncoder = GetEncoder(ImageFormat.Jpeg);
+            EncoderParameters encoderParams = new EncoderParameters(1);
+            // Chất lượng 85 để ảnh nét rõ chữ
+            encoderParams.Param[0] = new EncoderParameter(System.Drawing.Imaging.Encoder.Quality, 85L);
 
             while (isRunning && connectedClient != null && connectedClient.Connected)
             {
@@ -119,10 +130,10 @@ namespace RemoteServer
 
                         using (MemoryStream ms = new MemoryStream())
                         {
-                            bmp.Save(ms, ImageFormat.Jpeg);
+                            bmp.Save(ms, jpgEncoder, encoderParams);
                             byte[] buffer = ms.ToArray();
 
-                            lock (writer)
+                            lock (streamLock)
                             {
                                 writer.Write("SCREEN");
                                 writer.Write(buffer.Length);
@@ -131,7 +142,7 @@ namespace RemoteServer
                             }
                         }
                     }
-                    Thread.Sleep(33); // ~30 FPS
+                    Thread.Sleep(30);
                 }
                 catch { break; }
             }
@@ -171,15 +182,10 @@ namespace RemoteServer
                     {
                         mouse_event(MOUSEEVENTF_RIGHTUP, 0, 0, 0, 0);
                     }
-                    else if (command == "KEY_DOWN")
+                    else if (command == "UNICODE_KEY")
                     {
-                        byte keyCode = (byte)reader.ReadInt32();
-                        keybd_event(keyCode, 0, 0, 0);
-                    }
-                    else if (command == "KEY_UP")
-                    {
-                        byte keyCode = (byte)reader.ReadInt32();
-                        keybd_event(keyCode, 0, KEYEVENTF_KEYUP, 0);
+                        char keyChar = reader.ReadChar();
+                        SendKeys.SendWait(keyChar.ToString());
                     }
                     else if (command == "CHAT")
                     {
@@ -194,14 +200,13 @@ namespace RemoteServer
 
                         string savePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), fileName);
                         File.WriteAllBytes(savePath, fileBytes);
-                        AppendChatLog("[File]: Đã nhận " + fileName + " (Lưu tại Desktop)");
+                        AppendChatLog("[File]: Đã nhận " + fileName + " (Lưu ra Desktop)");
                     }
                 }
                 catch { break; }
             }
         }
 
-        // Server gửi tin nhắn phản hồi về Client
         private void btnSendReply_Click(object sender, EventArgs e)
         {
             string reply = txtServerReply.Text.Trim();
@@ -209,7 +214,7 @@ namespace RemoteServer
             {
                 try
                 {
-                    lock (writer)
+                    lock (streamLock)
                     {
                         writer.Write("SERVER_CHAT");
                         writer.Write(reply);

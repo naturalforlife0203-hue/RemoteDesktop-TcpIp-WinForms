@@ -1,4 +1,4 @@
 <Solution>
-  <Project Path="RemoteClient/RemoteClient.csproj" />
-  <Project Path="RemoteServer/RemoteServer.csproj" />
+  <Project Path="RemoteClient/RemoteClient.csproj" Id="a413e5cd-062d-46a1-9338-c23f2a8c7938" />
+  <Project Path="RemoteServer/RemoteServer.csproj" Id="1046bf18-8008-4282-9211-138de9cd4823" />
 </Solution>

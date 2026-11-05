@@ -16,7 +16,6 @@ namespace RemoteClient
         private BinaryReader reader;
 
         private PictureBox pictureBoxScreen;
-        private Button btnToggleControl;
         private Button btnHideCursor;
         private Button btnToggleChat;
         private Button btnSendFile;
@@ -31,7 +30,6 @@ namespace RemoteClient
 
         private Thread receiveThread;
         private bool isRunning = true;
-        private bool isControlEnabled = false; // Mặc định tắt điều khiển để không giật chuột khi test
         private bool isCursorHidden = false;
         private bool isFullscreen = false;
 
@@ -56,7 +54,7 @@ namespace RemoteClient
             this.BackColor = Color.FromArgb(18, 20, 26);
             this.KeyPreview = true;
 
-            // 1. Toolbar phẳng bo góc các nút
+            // 1. Toolbar phẳng
             Panel toolbar = new Panel
             {
                 Dock = DockStyle.Top,
@@ -65,38 +63,25 @@ namespace RemoteClient
                 Padding = new Padding(12, 8, 12, 8)
             };
 
-            // Nút Toggle Quyền điều khiển dạng Capsule bo tròn
-            btnToggleControl = new Button
-            {
-                Text = "🎮 Điều khiển: TẮT",
-                Font = new Font("Segoe UI Semibold", 9F, FontStyle.Bold),
-                Size = new Size(155, 36),
-                Location = new Point(14, 8),
-                FlatStyle = FlatStyle.Flat,
-                Cursor = Cursors.Hand
-            };
-            btnToggleControl.FlatAppearance.BorderSize = 0;
-            ApplyControlButtonStyle();
-            btnToggleControl.Click += (s, e) =>
-            {
-                isControlEnabled = !isControlEnabled;
-                ApplyControlButtonStyle();
-            };
-
-            btnHideCursor = CreateToolButton("👁️ Ẩn chuột", 180, (s, e) =>
+            // Nút Ẩn / Hiện chuột
+            btnHideCursor = CreateToolButton("👁️ Ẩn chuột", 14, (s, e) =>
             {
                 isCursorHidden = !isCursorHidden;
                 btnHideCursor.Text = isCursorHidden ? "👁️ Hiện chuột" : "👁️ Ẩn chuột";
                 if (isCursorHidden) Cursor.Hide(); else Cursor.Show();
+                pictureBoxScreen.Focus();
             });
 
-            btnToggleChat = CreateToolButton("💬 Hộp thư", 305, (s, e) =>
+            // Nút Ẩn / Hiện khung Chat
+            btnToggleChat = CreateToolButton("💬 Hộp thư", 140, (s, e) =>
             {
                 panelChat.Visible = !panelChat.Visible;
                 btnToggleChat.BackColor = panelChat.Visible ? Color.FromArgb(65, 75, 105) : Color.FromArgb(42, 46, 62);
+                pictureBoxScreen.Focus();
             });
 
-            btnSendFile = CreateToolButton("📁 Gửi File", 430, (s, e) =>
+            // Nút Gửi File sang Host
+            btnSendFile = CreateToolButton("📁 Gửi File", 266, (s, e) =>
             {
                 using (OpenFileDialog ofd = new OpenFileDialog { Title = "Chọn tập tin gửi tới Host" })
                 {
@@ -124,9 +109,11 @@ namespace RemoteClient
                         }
                     }
                 }
+                pictureBoxScreen.Focus();
             });
 
-            btnFullscreen = CreateToolButton("⛶ Toàn màn hình", 555, (s, e) =>
+            // Nút Chuyển chế độ Toàn màn hình
+            btnFullscreen = CreateToolButton("⛶ Toàn màn hình", 392, (s, e) =>
             {
                 isFullscreen = !isFullscreen;
                 if (isFullscreen)
@@ -141,9 +128,10 @@ namespace RemoteClient
                     this.WindowState = FormWindowState.Normal;
                     btnFullscreen.Text = "⛶ Toàn màn hình";
                 }
+                pictureBoxScreen.Focus();
             });
 
-            // Nút Ngắt kết nối bo tròn hiện đại
+            // Nút Ngắt kết nối
             btnDisconnect = new Button
             {
                 Text = "✕ Ngắt kết nối",
@@ -154,13 +142,13 @@ namespace RemoteClient
                 Size = new Size(125, 36),
                 Anchor = AnchorStyles.Top | AnchorStyles.Right,
                 Location = new Point(toolbar.Width - 142, 8),
-                Cursor = Cursors.Hand
+                Cursor = Cursors.Hand,
+                TabStop = false
             };
             btnDisconnect.FlatAppearance.BorderSize = 0;
             ApplyRoundedRegion(btnDisconnect, 10);
             btnDisconnect.Click += (s, e) => this.Close();
 
-            toolbar.Controls.Add(btnToggleControl);
             toolbar.Controls.Add(btnHideCursor);
             toolbar.Controls.Add(btnToggleChat);
             toolbar.Controls.Add(btnSendFile);
@@ -221,7 +209,8 @@ namespace RemoteClient
                 ForeColor = Color.White,
                 FlatStyle = FlatStyle.Flat,
                 Font = new Font("Segoe UI Semibold", 9F, FontStyle.Bold),
-                Cursor = Cursors.Hand
+                Cursor = Cursors.Hand,
+                TabStop = false
             };
             btnSendChat.FlatAppearance.BorderSize = 0;
             btnSendChat.Click += (s, e) => SendChatMessage();
@@ -234,7 +223,7 @@ namespace RemoteClient
             panelChat.Controls.Add(pnlBottomChat);
             panelChat.Controls.Add(lblChatHeader);
 
-            // 3. Màn hình remote
+            // 3. Màn hình điều khiển Remote
             pictureBoxScreen = new PictureBox
             {
                 Dock = DockStyle.Fill,
@@ -245,30 +234,12 @@ namespace RemoteClient
             pictureBoxScreen.MouseMove += PictureBoxScreen_MouseMove;
             pictureBoxScreen.MouseDown += PictureBoxScreen_MouseDown;
             pictureBoxScreen.MouseUp += PictureBoxScreen_MouseUp;
-            this.KeyDown += RemoteViewer_KeyDown;
-            this.KeyUp += RemoteViewer_KeyUp;
+            this.KeyPress += RemoteViewer_KeyPress;
             this.FormClosing += RemoteViewer_FormClosing;
 
             this.Controls.Add(pictureBoxScreen);
             this.Controls.Add(panelChat);
             this.Controls.Add(toolbar);
-        }
-
-        private void ApplyControlButtonStyle()
-        {
-            if (isControlEnabled)
-            {
-                btnToggleControl.Text = "🎮 Điều khiển: BẬT";
-                btnToggleControl.BackColor = Color.FromArgb(40, 167, 69); // Xanh lá nổi bật
-                btnToggleControl.ForeColor = Color.White;
-            }
-            else
-            {
-                btnToggleControl.Text = "🎮 Điều khiển: TẮT";
-                btnToggleControl.BackColor = Color.FromArgb(50, 55, 72);
-                btnToggleControl.ForeColor = Color.FromArgb(220, 225, 235);
-            }
-            ApplyRoundedRegion(btnToggleControl, 10);
         }
 
         private Button CreateToolButton(string text, int x, EventHandler onClick)
@@ -280,9 +251,10 @@ namespace RemoteClient
                 BackColor = Color.FromArgb(42, 46, 62),
                 FlatStyle = FlatStyle.Flat,
                 Font = new Font("Segoe UI", 9F),
-                Size = new Size(115, 36),
+                Size = new Size(116, 36),
                 Location = new Point(x, 8),
-                Cursor = Cursors.Hand
+                Cursor = Cursors.Hand,
+                TabStop = false
             };
             btn.FlatAppearance.BorderSize = 0;
             ApplyRoundedRegion(btn, 8);
@@ -327,6 +299,7 @@ namespace RemoteClient
                 }
                 catch { }
             }
+            pictureBoxScreen.Focus();
         }
 
         private void AppendChatLog(string msg)
@@ -370,9 +343,10 @@ namespace RemoteClient
             }
         }
 
+        // Tự động điều khiển chuột liên tục
         private void PictureBoxScreen_MouseMove(object sender, MouseEventArgs e)
         {
-            if (isRunning && isControlEnabled && pictureBoxScreen.Image != null)
+            if (isRunning && pictureBoxScreen.Image != null)
             {
                 try
                 {
@@ -391,7 +365,8 @@ namespace RemoteClient
 
         private void PictureBoxScreen_MouseDown(object sender, MouseEventArgs e)
         {
-            if (isRunning && isControlEnabled)
+            pictureBoxScreen.Focus(); // Giữ chắc focus khi click chuột vào máy ảo
+            if (isRunning)
             {
                 try
                 {
@@ -407,7 +382,7 @@ namespace RemoteClient
 
         private void PictureBoxScreen_MouseUp(object sender, MouseEventArgs e)
         {
-            if (isRunning && isControlEnabled)
+            if (isRunning)
             {
                 try
                 {
@@ -421,32 +396,18 @@ namespace RemoteClient
             }
         }
 
-        private void RemoteViewer_KeyDown(object sender, KeyEventArgs e)
+        // Gõ phím trực tiếp bằng Unicode
+        private void RemoteViewer_KeyPress(object sender, KeyPressEventArgs e)
         {
-            if (isRunning && isControlEnabled && !txtClientMsg.Focused)
+            if (isRunning && !txtClientMsg.Focused)
             {
                 try
                 {
                     lock (writer)
                     {
-                        writer.Write("KEY_DOWN");
-                        writer.Write((int)e.KeyCode);
-                    }
-                }
-                catch { }
-            }
-        }
-
-        private void RemoteViewer_KeyUp(object sender, KeyEventArgs e)
-        {
-            if (isRunning && isControlEnabled && !txtClientMsg.Focused)
-            {
-                try
-                {
-                    lock (writer)
-                    {
-                        writer.Write("KEY_UP");
-                        writer.Write((int)e.KeyCode);
+                        writer.Write("UNICODE_KEY");
+                        writer.Write(e.KeyChar);
+                        writer.Flush();
                     }
                 }
                 catch { }
